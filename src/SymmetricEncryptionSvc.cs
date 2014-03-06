@@ -14,17 +14,15 @@
          * For use cases that require interaction outside of the site, we would generate a new random (private) key for each instance where
          * we would store the generated key as well as the client app would store the generated private key.
         */
-        public const string Default256BitKey = "ef2591793d9644c8bdd9f8eb31bf0ed2dd6b3a8358c6af07e9ad0b0e9147d311";
+        public const string Default256BitKey = "bb80ff33ab8b98e2e6b434956490c59c8ac6a92e4f82f165aed6493f18a4177f";
 
-        private readonly ICipherCache _cipherCache;
-        private readonly ICipherRepo _cipherRepo;
-
-        public SymmetricEncyrptionSvc(ICipherRepo cipherRepo, ICipherCache cipherCache)
-        {
-            _cipherCache = cipherCache;
-            _cipherRepo = cipherRepo;
-        }
-
+        /// <summary>
+        /// Creates a RijndaelManaged cipher based on the given key material with a default 256 block size. If no key is given then the 
+        /// Default256BitKey is used.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="blockSize"></param>
+        /// <returns></returns>
         public RijndaelManaged CreateCipher(string key = "", int blockSize = 256)
         {
             if (((blockSize % 256) != 0) || ((blockSize % 256) != 128))
@@ -62,29 +60,21 @@
         /// <summary>
         /// Encrypts a string using the given key. To Decrypt you will need the proper initialization vector that gets randomly generated
         /// for each encryption process (i.e. different every time the encryption is run). This will happen automatically in our Decrypt 
-        /// method on this class because we're storing those initialization vectors with the encrypted text, BUT if you want to allow someone
-        /// else to be able to decrypt our cipher text then they'll need the private key as well as the initialization vector.
+        /// method on this class because we're prefixing those initialization vectors with the encrypted text.
         /// </summary>
         /// <param name="plainText"></param>
-        /// <param name="initVector"></param>
         /// <param name="key">MUST be a hex string based on a 256 bit byte array (i.e. new byte[32])</param>
         /// <param name="blockSize"></param>
         /// <returns></returns>
-        public string Encrypt(string plainText, string initVector = null, string key = "", int blockSize = 256)
+        public string Encrypt(string plainText, string key = "", int blockSize = 256)
         {
             if (string.IsNullOrEmpty(key))
             {
                 key = Default256BitKey;
             }
             var cipher = CreateCipher(key, blockSize);
-            if (initVector != null)
-            {
-                cipher.IV = HexToByteArray(initVector);
-            }
-            else
-            {
-                initVector = BytesToHexString(cipher.IV);
-            }
+
+            var initVector = BytesToHexString(cipher.IV);
 
             // Create the encryptor, convert to bytes, and encrypt the plainText string
             var cryptoTransform = cipher.CreateEncryptor();
@@ -96,50 +86,64 @@
             // We're using a hexadecimal string so that the cipherText can be used in URL's. Yes, there are other ways of doing that, but it's a style
             // choice.
             var cipherText = BytesToHexString(cipherTextBytes);
-            var hashedCipherText = ComputeBasicHash(cipherText);
-            _cipherRepo.SaveCipherTextAndVector(hashedCipherText, initVector);
-            _cipherCache.SaveCipherTextAndVector(hashedCipherText, initVector);
 
-            return cipherText;
+            return initVector + "_" + cipherText;
         }
 
         /// <summary>
-        /// Decrypts a given cipher text based on the provided key material. If the Initialization Vector is provided then that is what
-        /// will be used in the decryption process. If not then we will search the cache and database for an instance of CipherValues that 
-        /// has the same HashedCipherText value as the given cipherText parameter and use the value of that InitVector.
+        /// Decrypts a given cipher text based on the provided key material. The initialization vector should be prefixed to the cipher text followed
+        /// by an underscore for delimiting.
         /// </summary>
         /// <param name="cipherText"></param>
-        /// <param name="initVector"></param>
         /// <param name="key">MUST be a hex string based on a 256 bit byte array (i.e. new byte[32])</param>
         /// <param name="blockSize"></param>
         /// <returns></returns>
-        public string Decrypt(string cipherText, string initVector = null, string key = "", int blockSize = 256)
+        public string Decrypt(string cipherText, string key = "", int blockSize = 256)
         {
             if (string.IsNullOrEmpty(key))
             {
                 key = Default256BitKey;
             }
             var cipher = CreateCipher(key, blockSize);
-            if (initVector == null)
-            {
-                initVector = GetStoredInitVector(cipherText);
-                if (initVector == null) return string.Empty;
-            }
+            var splitCipherText = cipherText.Split('_');
+            if (splitCipherText.Length != 2) return null;
+            var initVector = splitCipherText[0];
+            var encString = splitCipherText[1];
+
             cipher.IV = HexToByteArray(initVector);
 
             var cryptoTransform = cipher.CreateDecryptor();
-            var cipherBytes = HexToByteArray(cipherText);
+            var cipherBytes = HexToByteArray(encString);
+            if (cipherBytes == null) return null;
             var plainTextBytes = cryptoTransform.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
-
             return Encoding.UTF8.GetString(plainTextBytes);
         }
 
+        /// <summary>
+        /// Checks to see if the given text is encrypted based on the logic in this class.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public bool IsEncrypted(string text)
+        {
+            var decrypted = Decrypt(text);
+            return !string.IsNullOrEmpty(decrypted);
+        }
+
+        /// <summary>
+        /// Generates random, non-zero bytes using the RNGCryptoServiceProvider
+        /// </summary>
+        /// <param name="buffer"></param>
         public void GenerateRandomBytes(byte[] buffer)
         {
             var rng = new RNGCryptoServiceProvider();
             rng.GetNonZeroBytes(buffer);
         }
 
+        /// <summary>
+        /// Generates a random 256 bit key (in a byte array) and returns it as a hexadecimal string.
+        /// </summary>
+        /// <returns>A hexadecimal string based on the randomly generated 256 bit key byte array</returns>
         public string Generate256BitKey()
         {
             var key = new byte[32];
@@ -149,7 +153,7 @@
 
         /// <summary>
         /// This will compute a basic SHA1 hash for uses within this Encryption Service class. This hash is not recommended for
-        /// true security use cases. 
+        /// true security use cases. For great security checkout PWDTK.Net https://github.com/Thashiznets/PWDTK.NET?source=c
         /// </summary>
         /// <param name="textToHash"></param>
         /// <param name="salt"></param>
@@ -162,11 +166,21 @@
             return hashHexString;
         }
 
+        /// <summary>
+        /// Converts a given byte array into a hexadecimal string.
+        /// </summary>
+        /// <param name="byteArray"></param>
+        /// <returns></returns>
         public string BytesToHexString(byte[] byteArray)
         {
             return new SoapHexBinary(byteArray).ToString();
         }
 
+        /// <summary>
+        /// Converts a given hexadecimal string into a byte array. The Hex string must be in multiple of 2's in length or it will throw an exception.
+        /// </summary>
+        /// <param name="hexString"></param>
+        /// <returns></returns>
         public byte[] HexToByteArray(string hexString)
         {
             if (0 != (hexString.Length % 2))
@@ -182,41 +196,5 @@
 
             return byteValues;
         }
-
-        public string GetStoredInitVector(string cipherText)
-        {
-            var hashedText = ComputeBasicHash(cipherText, "");
-            var iv = _cipherCache.GetCipherTextAndVector(hashedText).InitVector;
-            if (string.IsNullOrEmpty(iv))
-            {
-                iv = _cipherRepo.GetCipherTextAndVector(hashedText).InitVector;
-            }
-            return iv;
-        }
-
-        public CipherValues GetCipherData(string cipherText)
-        {
-            var hashedCipherText = ComputeBasicHash(cipherText, "");
-            var cipherData = _cipherCache.GetCipherTextAndVector(hashedCipherText) ?? _cipherRepo.GetCipherTextAndVector(hashedCipherText);
-            return cipherData;
-        }
-    }
-
-    public class CipherValues
-    {
-        public string HashedCipherText { get; set; }
-        public string InitVector { get; set; }
-    }
-
-    public interface ICipherCache
-    {
-        CipherValues GetCipherTextAndVector(string hashedCipherText);
-        void SaveCipherTextAndVector(string hashedCipherText, string initVector);
-    }
-
-    public interface ICipherRepo
-    {
-        CipherValues GetCipherTextAndVector(string hashedCipherText);
-        void SaveCipherTextAndVector(string hashedCipherText, string initVector);
     }
 }
