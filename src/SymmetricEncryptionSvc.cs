@@ -14,7 +14,7 @@
          * For use cases that require interaction outside of the site, we would generate a new random (private) key for each instance where
          * we would store the generated key as well as the client app would store the generated private key.
         */
-        public const string Default256BitKey = "bb80ff33ab8b98e2e6b434956490c59c8ac6a92e4f82f165aed6493f18a4177f";
+        public const string Default256BitKey = "8620e533dacbe46bffe0f3ea256f6b40c5578c96a8c8fcfc97180f32837ed4aa";
 
         /// <summary>
         /// Creates a RijndaelManaged cipher based on the given key material with a default 256 block size. If no key is given then the 
@@ -81,8 +81,7 @@
             var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
             var cipherTextBytes = cryptoTransform.TransformFinalBlock(plainTextBytes, 0, plainTextBytes.Length);
 
-            // Get the Hexadecimal string of the cipherTextBytes, hash it, and store it in the cache and the database with the Initialization Vector.
-            // We're hashing it to save space on the storage mechanisms
+            // Get the Hexadecimal string of the cipherTextBytes, hash it, and prefix the Initialization Vector to it.
             // We're using a hexadecimal string so that the cipherText can be used in URL's. Yes, there are other ways of doing that, but it's a style
             // choice.
             var cipherText = BytesToHexString(cipherTextBytes);
@@ -138,6 +137,18 @@
         {
             var rng = new RNGCryptoServiceProvider();
             rng.GetNonZeroBytes(buffer);
+        }
+
+        /// <summary>
+        /// Generates a random byte array key based on the byte length given and returns it as a hexadecimal string.
+        /// </summary>
+        /// <param name="byteLength"></param>
+        /// <returns></returns>
+        public string GenerateKeyFromByteLength(int byteLength)
+        {
+            var key = new byte[byteLength];
+            GenerateRandomBytes(key);
+            return BytesToHexString(key);
         }
 
         /// <summary>
