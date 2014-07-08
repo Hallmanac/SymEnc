@@ -178,6 +178,21 @@
         }
 
         /// <summary>
+        /// Computes a hash for the given <see cref="textToHash"/> based on the HMACSha1 algorithm using the given <see cref="key"/>.
+        /// </summary>
+        /// <param name="key">Key used in the hashing algorithm</param>
+        /// <param name="textToHash">Text value to hash</param>
+        /// <param name="salt">Optional salt to append to the <see cref="textToHash"/></param>
+        /// <returns></returns>
+        public string ComputeHmacSha1(string key, string textToHash, string salt = "")
+        {
+            var hmacSha1 = new HMACSHA1(Encoding.UTF8.GetBytes(key));
+            var hash = hmacSha1.ComputeHash(Encoding.UTF8.GetBytes(textToHash + salt));
+            var hashToHexString = BytesToHexString(hash);
+            return hashToHexString;
+        }
+
+        /// <summary>
         /// Converts a given byte array into a hexadecimal string.
         /// </summary>
         /// <param name="byteArray"></param>
