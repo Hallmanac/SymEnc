@@ -49,7 +49,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\SymEnc.Core.csproj">
+    <ProjectReference Include="..\SymEnc.Core\SymEnc.Core.csproj">
       <Project>{065097cd-7beb-4b32-a3c6-422a5a2ee16b}</Project>
       <Name>SymEnc.Core</Name>
     </ProjectReference>
