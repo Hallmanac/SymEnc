@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymEnc.Core", "SymEnc.Core\SymEnc.Core.csproj", "{065097CD-7BEB-4B32-A3C6-422A5A2EE16B}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{065097CD-7BEB-4B32-A3C6-422A5A2EE16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{065097CD-7BEB-4B32-A3C6-422A5A2EE16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{065097CD-7BEB-4B32-A3C6-422A5A2EE16B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{065097CD-7BEB-4B32-A3C6-422A5A2EE16B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
