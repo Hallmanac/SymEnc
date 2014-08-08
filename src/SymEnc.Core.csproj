@@ -7,8 +7,8 @@
     <ProjectGuid>{065097CD-7BEB-4B32-A3C6-422A5A2EE16B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SymEnc</RootNamespace>
-    <AssemblyName>SymEnc</AssemblyName>
+    <RootNamespace>SymEnc.Core</RootNamespace>
+    <AssemblyName>SymEnc.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

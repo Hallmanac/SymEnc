@@ -1,24 +1,24 @@
-﻿namespace SymEnc
-{
-    using System;
-    using System.Runtime.Remoting.Metadata.W3cXsd2001;
-    using System.Security.Cryptography;
-    using System.Text;
+﻿using System;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Security.Cryptography;
+using System.Text;
 
+namespace SymEnc.Core
+{
     public class SymmetricEncyrptionSvc
     {
         /* 
          * CHANGE THIS KEY FOR YOUR APPLICATION!!
-         * Generated randomly from http://www.random.org/bytes/ --> choose to generate 32 random bytes and output Hexadecimal string
+         * Generate your key using the console application located with the source code at https://github.com/Hallmanac/SymEnc.
          * This key is used for encrypting/decrypting site data and is used as the default key when no key is given.
          * For use cases that require interaction outside of the site, we would generate a new random (private) key for each instance where
          * we would store the generated key as well as the client app would store the generated private key.
         */
-        public const string Default256BitKey = "8620e533dacbe46bffe0f3ea256f6b40c5578c96a8c8fcfc97180f32837ed4aa";
+        public const string Default256BitKey = "16CF22659BB1DE3038B2058C98687A21ED9F103A1162BC32E35BCCC46A905C5B";
 
         /// <summary>
         /// Creates a RijndaelManaged cipher based on the given key material with a default 256 block size. If no key is given then the 
-        /// Default256BitKey is used.
+        /// <see cref="Default256BitKey"/> is used.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="blockSize"></param>
