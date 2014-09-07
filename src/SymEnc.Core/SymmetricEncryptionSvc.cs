@@ -222,5 +222,16 @@ namespace SymEnc.Core
 
             return byteValues;
         }
+
+        /// <summary>
+        /// Computes a hash based on the HMACSHA1 algorithm using the given key.
+        /// </summary>
+        public string ComputeHmacSha1(string textToHash, string key = Default256BitKey)
+        {
+            var hmacSha1 = new HMACSHA1(Encoding.UTF8.GetBytes(key));
+            var hash = hmacSha1.ComputeHash(Encoding.UTF8.GetBytes(textToHash));
+            var hashToHexString = new SoapHexBinary(hash).ToString();
+            return hashToHexString;
+        }
     }
 }
