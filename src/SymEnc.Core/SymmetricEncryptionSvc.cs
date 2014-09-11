@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Security.Cryptography;
 using System.Text;
@@ -94,13 +95,24 @@ namespace SymEnc.Core
                 return null;
             var initVector = splitCipherText[0];
             var encString = splitCipherText[1];
+            if (0 != initVector.Length % 2 || 0 != encString.Length % 2)
+                return null;
+
             cipher.IV = HexToByteArray(initVector);
             var cryptoTransform = cipher.CreateDecryptor();
             var cipherBytes = HexToByteArray(encString);
             if(cipherBytes == null)
                 return null;
-            var plainTextBytes = cryptoTransform.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
-            return Encoding.UTF8.GetString(plainTextBytes);
+            try
+            {
+                var plainTextBytes = cryptoTransform.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
+                return Encoding.UTF8.GetString(plainTextBytes);
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e.Message);
+                return string.Empty;
+            }
         }
 
         /// <summary>
@@ -173,7 +185,9 @@ namespace SymEnc.Core
             var byteValues = new byte[byteCount];
             for(var i = 0; i < byteCount; i++)
             {
-                byteValues[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+                byte byteVal;
+                byte.TryParse(hexString.Substring(i * 2, 2), out byteVal);
+                byteValues[i] = byteVal;
             }
             return byteValues;
         }
