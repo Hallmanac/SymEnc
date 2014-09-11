@@ -185,9 +185,7 @@ namespace SymEnc.Core
             var byteValues = new byte[byteCount];
             for(var i = 0; i < byteCount; i++)
             {
-                byte byteVal;
-                byte.TryParse(hexString.Substring(i * 2, 2), out byteVal);
-                byteValues[i] = byteVal;
+                byteValues[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
             }
             return byteValues;
         }
