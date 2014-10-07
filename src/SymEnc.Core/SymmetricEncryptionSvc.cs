@@ -87,24 +87,24 @@ namespace SymEnc.Core
         /// <returns></returns>
         public string Decrypt(string cipherText, string key = "", int blockSize = 256)
         {
-            if(string.IsNullOrEmpty(key))
-                key = Default256BitKey;
-            var cipher = CreateCipher(key, blockSize);
-            var splitCipherText = cipherText.Split('_');
-            if(splitCipherText.Length != 2)
-                return null;
-            var initVector = splitCipherText[0];
-            var encString = splitCipherText[1];
-            if (0 != initVector.Length % 2 || 0 != encString.Length % 2)
-                return null;
-
-            cipher.IV = HexToByteArray(initVector);
-            var cryptoTransform = cipher.CreateDecryptor();
-            var cipherBytes = HexToByteArray(encString);
-            if(cipherBytes == null)
-                return null;
             try
             {
+                if (string.IsNullOrEmpty(key))
+                    key = Default256BitKey;
+                var cipher = CreateCipher(key, blockSize);
+                var splitCipherText = cipherText.Split('_');
+                if (splitCipherText.Length != 2)
+                    return null;
+                var initVector = splitCipherText[0];
+                var encString = splitCipherText[1];
+                if (0 != initVector.Length % 2 || 0 != encString.Length % 2)
+                    return null;
+
+                cipher.IV = HexToByteArray(initVector);
+                var cryptoTransform = cipher.CreateDecryptor();
+                var cipherBytes = HexToByteArray(encString);
+                if (cipherBytes == null)
+                    return null;
                 var plainTextBytes = cryptoTransform.TransformFinalBlock(cipherBytes, 0, cipherBytes.Length);
                 return Encoding.UTF8.GetString(plainTextBytes);
             }
