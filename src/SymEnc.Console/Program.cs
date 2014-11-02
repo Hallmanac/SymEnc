@@ -8,10 +8,19 @@ namespace SymEnc.Console
         private static void Main(string[] args)
         {
             var symEnc = new SymmetricEncyrptionSvc();
-            var keyFor256 = symEnc.Generate256BitKey();
-            System.Console.WriteLine("The generated 256 bit key is:\n{0}", keyFor256);
+            var continueGenerating256BitKeys = true;
+            while(continueGenerating256BitKeys)
+            {
+                var keyFor256 = symEnc.Generate256BitKey();
+                System.Console.WriteLine("The generated 256 bit key is:\n{0}", keyFor256);
+                System.Console.WriteLine("\nWould you like to generate another 256 bit key? (Y or N)");
+                var continueAnswer = System.Console.ReadLine();
+                continueGenerating256BitKeys = !string.IsNullOrEmpty(continueAnswer) &&
+                                               (string.Equals("Y", continueAnswer, StringComparison.CurrentCultureIgnoreCase) ||
+                                                string.Equals("yes", continueAnswer, StringComparison.CurrentCultureIgnoreCase));
+            }
             
-            System.Console.WriteLine("\nEnter an integer to generate a key based on that length...");
+            System.Console.WriteLine("\nEnter an even numbered integer to generate a hexidecimal key based on that length...");
 
             var keySizeStr = System.Console.ReadLine();
             int keySize;
