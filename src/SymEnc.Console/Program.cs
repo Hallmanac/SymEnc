@@ -26,7 +26,7 @@ namespace SymEnc.Console
             }
             System.Console.WriteLine("\nEnter a string to hash using the HMACSHA1 algorithm.");
             var textToHash = System.Console.ReadLine();
-            var hashedText = symEnc.ComputeHmacSha1(textToHash);
+            var hashedText = symEnc.ComputeHmacSha1ForHex(textToHash);
 
             System.Console.WriteLine("\nThe computed hash is:\n{0}", hashedText);
         }
