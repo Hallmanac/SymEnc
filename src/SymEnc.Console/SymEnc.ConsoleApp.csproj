@@ -7,8 +7,8 @@
     <ProjectGuid>{1E79CED8-64AE-45B1-987F-A2579BEBD722}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SymEnc.Console</RootNamespace>
-    <AssemblyName>SymEnc.Console</AssemblyName>
+    <RootNamespace>SymEnc.ConsoleApp</RootNamespace>
+    <AssemblyName>SymEnc.ConsoleApp</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

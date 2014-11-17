@@ -1,11 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymEnc.Core", "SymEnc.Core\SymEnc.Core.csproj", "{065097CD-7BEB-4B32-A3C6-422A5A2EE16B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymEnc.Console", "SymEnc.Console\SymEnc.Console.csproj", "{1E79CED8-64AE-45B1-987F-A2579BEBD722}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SymEnc.ConsoleApp", "SymEnc.Console\SymEnc.ConsoleApp.csproj", "{1E79CED8-64AE-45B1-987F-A2579BEBD722}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FFB973A7-712F-4065-AA46-D04EB2045C8B}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
