@@ -8,6 +8,19 @@ namespace SymEnc.Core
 {
   public class SymmetricEncyrptionSvc : ISymmetricEncyrptionSvc
   {
+    /// <summary>
+    ///   Class that provides symmetric encryption services using the given <see cref="default256BitKey" />. This class
+    ///   can be resolved using any IOC container.
+    ///   <example>
+    ///     "_container.RegisterType[ISymmetricEncryptionSvc, EncrpytionSvc>(new
+    ///     InjectionConstructor("16CF22659BB1DE3038B2058C98687A21ED9F103A1162BC32E35BCCC46A905C5B"))"
+    ///   </example>
+    /// </summary>
+    /// <param name="default256BitKey">
+    ///   The Default 256 bit key used when no key is given in the public methods. This should be unique
+    ///   to your application.
+    ///   <example>Example-Key = "16CF22659BB1DE3038B2058C98687A21ED9F103A1162BC32E35BCCC46A905C5B"</example>
+    /// </param>
     public SymmetricEncyrptionSvc(string default256BitKey) { Default256BitKey = default256BitKey; }
 
     /// <summary>
@@ -68,21 +81,31 @@ namespace SymEnc.Core
     /// <returns>Encrypted Hexadecimal string of the given <see cref="plainText" /></returns>
     public string Encrypt(string plainText, string key = "", int blockSize = 256)
     {
+      if(string.IsNullOrEmpty(plainText))
+        return null;
       if(string.IsNullOrEmpty(key))
         key = Default256BitKey;
-      var cipher = CreateCipher(key, blockSize);
-      var initVector = BytesToHexString(cipher.IV);
+      try
+      {
+        var cipher = CreateCipher(key, blockSize);
+        var initVector = BytesToHexString(cipher.IV);
 
-      // Create the encryptor, convert to bytes, and encrypt the plainText string
-      var cryptoTransform = cipher.CreateEncryptor();
-      var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-      var cipherTextBytes = cryptoTransform.TransformFinalBlock(plainTextBytes, 0, plainTextBytes.Length);
+        // Create the encryptor, convert to bytes, and encrypt the plainText string
+        var cryptoTransform = cipher.CreateEncryptor();
+        var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+        var cipherTextBytes = cryptoTransform.TransformFinalBlock(plainTextBytes, 0, plainTextBytes.Length);
 
-      // Get the Hexadecimal string of the cipherTextBytes, hash it, and prefix the Initialization Vector to it.
-      // We're using a hexadecimal string so that the cipherText can be used in URL's. Yes, there are other ways of doing that, but it's a style
-      // choice.
-      var cipherText = BytesToHexString(cipherTextBytes);
-      return initVector + "_" + cipherText;
+        // Get the Hexadecimal string of the cipherTextBytes, hash it, and prefix the Initialization Vector to it.
+        // We're using a hexadecimal string so that the cipherText can be used in URL's. Yes, there are other ways of doing that, but it's a style
+        // choice.
+        var cipherText = BytesToHexString(cipherTextBytes);
+        return initVector + "_" + cipherText;
+      }
+      catch(Exception e)
+      {
+        Trace.WriteLine(e);
+        return null;
+      }
     }
 
     /// <summary>
@@ -128,6 +151,8 @@ namespace SymEnc.Core
     /// </summary>
     public bool IsEncrypted(string text)
     {
+      if(string.IsNullOrEmpty(text))
+        return false;
       var decrypted = Decrypt(text);
       return !string.IsNullOrEmpty(decrypted);
     }
@@ -138,6 +163,8 @@ namespace SymEnc.Core
     /// <param name="buffer">Length of random bytes to be generated.</param>
     public void GenerateRandomBytes(byte[] buffer)
     {
+      if(buffer == null)
+        return;
       var rng = new RNGCryptoServiceProvider();
       rng.GetNonZeroBytes(buffer);
     }
@@ -171,6 +198,8 @@ namespace SymEnc.Core
     /// </summary>
     public string ComputeBasicHash(string textToHash, string salt = "")
     {
+      if(string.IsNullOrEmpty(textToHash))
+        return null;
       var hashAlgorithm = new SHA1Managed();
       var hash = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(textToHash + salt));
       var hashHexString = BytesToHexString(hash);
@@ -180,7 +209,7 @@ namespace SymEnc.Core
     /// <summary>
     ///   Converts a given byte array into a hexadecimal string.
     /// </summary>
-    public string BytesToHexString(byte[] byteArray) { return new SoapHexBinary(byteArray).ToString(); }
+    public string BytesToHexString(byte[] byteArray) { return byteArray == null ? null : new SoapHexBinary(byteArray).ToString(); }
 
     /// <summary>
     ///   Converts a given hexadecimal string into a byte array. The Hex string must be in multiple of 2's in length or it will
@@ -188,6 +217,8 @@ namespace SymEnc.Core
     /// </summary>
     public byte[] HexToByteArray(string hexString)
     {
+      if(string.IsNullOrEmpty(hexString))
+        return null;
       if(0 != (hexString.Length % 2))
         throw new ApplicationException("Hex string must be multiple of 2 in length");
       var byteCount = hexString.Length / 2;
@@ -204,6 +235,8 @@ namespace SymEnc.Core
     /// </summary>
     public string ComputeHmacSha1ForHex(string textToHash, string key = "")
     {
+      if(string.IsNullOrEmpty(textToHash))
+        return null;
       if(string.IsNullOrEmpty(key))
         key = Default256BitKey;
       var hmacSha1 = new HMACSHA1(Encoding.UTF8.GetBytes(key));
@@ -232,6 +265,8 @@ namespace SymEnc.Core
     /// </summary>
     public string ComputeHmacSha1ForBase64(string textToEncode, string key = "")
     {
+      if(string.IsNullOrEmpty(textToEncode))
+        return null;
       if(string.IsNullOrEmpty(key))
         key = Default256BitKey;
       var hmacSha1 = new HMACSHA1(Encoding.UTF8.GetBytes(key));
