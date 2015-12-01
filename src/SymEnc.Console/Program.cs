@@ -33,15 +33,15 @@ namespace SymEnc.ConsoleApp
 
 				// Base64 key
 				var base64Key = symEnc.GenerateBase64KeyFromByteLength(keySize);
-				Console.WriteLine("\nThe generated key based on a length of {0} is:\n{1}", keySizeStr, base64Key);
+				Console.WriteLine("\nThe generated Base64 key based on a length of {0} is:\n{1}", keySizeStr, base64Key);
 
 				// 64 bit number
 				var random64BitNumber = symEnc.GenerateRandom64BitNumberFromByteLength(keySize);
-				Console.WriteLine("\nThe generated key based on a length of {0} is:\n{1}", keySizeStr, random64BitNumber);
+				Console.WriteLine("\nThe generated 64 bit random number based on a length of {0} is:\n{1}", keySizeStr, random64BitNumber);
 
 				// 32 bit number
 				var random32BitNumber = symEnc.GenerateRandom32BitNumberFromByteLength(keySize);
-				Console.WriteLine("\nThe generated key based on a length of {0} is:\n{1}", keySizeStr, random32BitNumber);
+				Console.WriteLine("\nThe generated 32 bit random number based on a length of {0} is:\n{1}", keySizeStr, random32BitNumber);
 
 			}
 			else
