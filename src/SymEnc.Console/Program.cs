@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 
 using SymEnc.Core;
 
@@ -50,6 +51,22 @@ namespace SymEnc.ConsoleApp
 			var textToHash = Console.ReadLine();
 			var hashedText = symEnc.ComputeHmacSha1ForHex(textToHash);
 			Console.WriteLine("\nThe computed hash is:\n{0}", hashedText);
+
+		    var continueEncryption = true;
+		    while (continueEncryption)
+		    {
+                Console.WriteLine("\nEnter a 256bit key for custom encryption:");
+                var customKey = Console.ReadLine();
+                Console.WriteLine("\nEnter value to encrypt:");
+                var valueToEncrypt = Console.ReadLine();
+                var encryptedText = symEnc.Encrypt(valueToEncrypt, customKey);
+                Console.WriteLine($"The encrypted text is:\n{encryptedText}");
+		        Console.WriteLine("\nWould you like to encrypt another value? (Y or N)");
+		        var answer = Console.ReadLine();
+                continueEncryption = !string.IsNullOrEmpty(answer) &&
+                                               (string.Equals("Y", answer, StringComparison.CurrentCultureIgnoreCase) ||
+                                                string.Equals("yes", answer, StringComparison.CurrentCultureIgnoreCase));
+            }
 			Console.ReadKey();
 		}
 	}
